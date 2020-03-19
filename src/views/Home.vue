@@ -6,15 +6,9 @@
       <div :class="orderColumnClass">
         <FilmOrdersListColumn @toggle-enlarge="toggleOrderColumnEnlarge" />
       </div>
-      <!-- <div :class="productColumnClass">
-        <ProductColumn @toggle-enlarge="toggleProductColumnEnlarge" />
+      <div :class="productSimpleColumnClass">
+        <FilmProductSimpleColumn @toggle-enlarge="toggleProductSimpleColumnEnlarge" />
       </div>
-      <div :class="jobColumnClass">
-        <JobColumn @toggle-enlarge="toggleJobColumnEnlarge" />
-      </div> -->
-      <!-- <div class="p-col">
-        <ProductTable :_id="slotProps.data._id" />
-      </div> -->
     </div>
   </div>
 </template>
@@ -22,25 +16,25 @@
 <script>
 // @ is an alias to /src
 import FilmOrdersListColumn from '@/components/FilmOrdersListColumn.vue'
-// import ProductTable from '@/components/ProductTable.vue'
+import FilmProductSimpleColumn from '@/components/FilmProductSimpleColumn.vue'
 
 export default {
   name: 'Home',
   components: {
     FilmOrdersListColumn,
-    // ProductTable,
+    FilmProductSimpleColumn,
   },
   data: () => ({
     orderColumnEnlarge: true,
-    productColumnEnlarge: true,
+    productSimpleColumnEnlarge: true,
     jobColumnEnlarge: true,
   }),
   methods: {
     toggleOrderColumnEnlarge() {
       this.orderColumnEnlarge = !this.orderColumnEnlarge
     },
-    toggleProductColumnEnlarge() {
-      this.productColumnEnlarge = !this.productColumnEnlarge
+    toggleProductSimpleColumnEnlarge() {
+      this.productSimpleColumnEnlarge = !this.productSimpleColumnEnlarge
     },
     toggleJobColumnEnlarge() {
       this.jobColumnEnlarge = !this.jobColumnEnlarge
@@ -50,8 +44,8 @@ export default {
     orderColumnClass: function() {
       return this.orderColumnEnlarge ? 'p-col-12' : 'p-col-2'
     },
-    productColumnClass: function() {
-      return this.productColumnEnlarge ? 'p-col-3' : 'p-col-1'
+    productSimpleColumnClass: function() {
+      return this.productSimpleColumnEnlarge ? 'p-col-12' : 'p-col-2'
     },
     jobColumnClass: function() {
       return this.jobColumnEnlarge ? 'p-col-3' : 'p-col-1'

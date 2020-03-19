@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <DataTable :value="list" data-key="_id" :selection.sync="selected" :filters="filters" :rowHover="true" :loading="loading" loadingIcon="">
+  <div v-if="prodList.length > 0">
+    <DataTable :value="prodList" data-key="_id" :selection.sync="prodListSelected" :filters="filters" :rowHover="true" :loading="loading" loadingIcon="">
       <template #header>
         <div class="table-header-container">
           <div style="text-align: left">
@@ -14,9 +14,12 @@
       </template>
       <Column selectionMode="multiple" headerStyle="width: 3em" :sortable="true" sortField="selected"></Column>
       <!-- <Column v-if="enlarge" :expander="true" headerStyle="width: 3em" /> -->
-      <Column field="shortTitle" header="Short Title" :headerStyle="enlarge ? 'width: 12%' : ''" filterMatchMode="contains" :sortable="true">
+      <Column field="_id" header="ID" :headerStyle="enlarge ? 'width: 12%' : ''" filterMatchMode="contains" :sortable="true">
         <template #filter>
-          <InputText type="text" v-model="filters['shortTitle']" class="p-column-filter" />
+          <InputText type="text" v-model="filters['_id']" class="p-column-filter" />
+        </template>
+        <template #body="slotProps">
+          <span>{{ slotProps.data._id.replace('.', ' - ').toProperCase() }}</span>
         </template>
       </Column>
       <Column v-if="enlarge" field="premiereDate" header="NKC" filterMatchMode="contains" :sortable="true">
@@ -70,7 +73,7 @@
       <template #footer>
         <div style="text-align:left">
           <Button :label="enlarge ? 'Create New Order' : ''" icon="pi pi-plus" @click="addNewOrder" class="margin-right" />
-          <Button :label="enlarge ? 'Load Details' : ''" icon="pi pi-download" @click="loadOrderDetail" :disabled="selected.length === 0" class="margin-right" />
+          <Button :label="enlarge ? 'Load Details' : ''" icon="pi pi-download" @click="loadOrderDetail" :disabled="prodListSelected.length === 0" class="margin-right" />
           <Button :label="enlarge ? 'Delete Orders' : ''" icon="pi pi-minus" @click="delOrder" class="p-button-danger margin-right" />
           <ToggleButton v-model="enlarge" @change="onToggleEnlarge" onIcon="pi pi-angle-left" offIcon="pi pi-angle-right" />
         </div>
@@ -104,7 +107,7 @@
           </div>
         </div>
         <div v-else-if="wantDelOrder">
-          <DataTable :value="selected" data-key="_id" :selection.sync="filmOrdersListWillDelete" :rowHover="true">
+          <DataTable :value="prodListSelected" data-key="_id" :selection.sync="filmOrdersListWillDelete" :rowHover="true">
             <Column selectionMode="multiple" headerStyle="width: 3em"></Column>
             <Column field="shortTitle" header="Short Title"> </Column>
             <Column field="premiereDate" header="NKC">
@@ -132,7 +135,7 @@ import defaultState from '@/assets/defaultState'
 const defaultNewOrder = JSON.stringify(defaultState.newOrder)
 
 export default {
-  name: 'OrderColumn',
+  name: 'FilmProductSimpleColumn',
   components: {},
   data: () => ({
     filters: {},
@@ -181,13 +184,13 @@ export default {
       this.message = { text: '', severity: '' }
     },
     deleteAllOrdersSelected() {
-      if (this.filmOrdersListWillDelete.length === this.selected.length) {
+      if (this.filmOrdersListWillDelete.length === this.prodListSelected.length) {
         this.wantDelOrder = false
-        this.selected = []
+        this.prodListSelected = []
         const _delList = this.filmOrdersListWillDelete.map(fo => fo._id)
         this.filmOrdersListWillDelete = []
         this.$store.commit('filmOrdersList/filterSome', { state: 'list', _ids: _delList })
-      } else this.message = { text: 'Select All to Confirm', severity: 'error' }
+      } else this.message = { text: 'Select All to Confirm', severity: 'esrror' }
     },
     saveNewOrder() {
       let _validateMess = ''
@@ -205,17 +208,12 @@ export default {
     },
   },
   computed: {
-    selected: {
+    prodListSelected: {
       get() {
-        return this.$store.state.filmOrdersList.selected
+        return this.$store.state.filmOrdersList.prodListSelected
       },
       set(value) {
-        this.$store.commit('filmOrdersList/setState', { state: 'selected', value: value })
-        let _prodList = []
-        value.map(fo => {
-          _prodList = [..._prodList, ...fo.products]
-        })
-        this.$store.commit('filmOrdersList/setState', { state: 'prodList', value: _prodList })
+        this.$store.commit('filmOrdersList/setState', { state: 'prodListSelected', value: value })
       },
     },
     openDialog: {
@@ -262,7 +260,7 @@ export default {
       },
     },
     ...mapState({
-      list: state => state.filmOrdersList.list,
+      prodList: state => state.filmOrdersList.prodList,
       loading: state => state.filmOrdersList.loading,
     }),
   },

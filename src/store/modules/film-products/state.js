@@ -13,6 +13,4 @@ export default {
   },
   createNewOrder: false,
   wantDelOrder: false,
-  prodList: [],
-  prodListSelected: [],
 }
