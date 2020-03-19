@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Orders</router-link> |
-      <router-link to="/jobs">Jobs</router-link>
+      <router-link to="/homev2">Ordersv2</router-link>
     </div>
     <router-view />
   </div>
@@ -13,12 +13,16 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #f7941d;
+  /* width: 1280px; */
+  margin: auto;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  padding: 8px;
 }
 
 #nav {
-  padding: 30px;
+  padding: 12px;
+  text-align: center;
 }
 
 #nav a {

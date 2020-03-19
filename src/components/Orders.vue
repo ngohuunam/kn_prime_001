@@ -1,16 +1,31 @@
 <template>
   <div>
-    <DataTable :value="orders" :filters="filters" :expandedRows.sync="expandedRows" @row-expand="onRowExpand" @row-collapse="onRowCollapse" :paginator="true" :rows="10" :rowHover="true">
+    <DataTable
+      data-key="_id"
+      :value="orderList"
+      :filters="filters"
+      :expandedRows.sync="expandedRows"
+      @row-expand="onRowExpand"
+      @row-collapse="onRowCollapse"
+      :paginator="true"
+      :rows="10"
+      :rowHover="true"
+      :lazy="true"
+      :loading="ordersListLoading"
+    >
       <template #header>
         <div class="table-header-container">
-          <Button icon="pi pi-plus" label="Expand All" @click="expandAll" />
-          <Button icon="pi pi-minus" label="Collapse All" @click="collapseAll" />
-          <div style="text-align: right">
+          <div style="text-align: left">
             <InputText v-model="filters['global']" placeholder="Global Search" size="50" />
           </div>
         </div>
       </template>
       <Column :expander="true" headerStyle="width: 3em" />
+      <Column field="team" header="Team" filterMatchMode="contains">
+        <template #filter>
+          <InputText type="text" v-model="filters['team']" class="p-column-filter" placeholder="Contains" />
+        </template>
+      </Column>
       <Column field="foreignTitle" header="Foreign Title" filterMatchMode="contains">
         <template #filter>
           <InputText type="text" v-model="filters['foreignTitle']" class="p-column-filter" placeholder="Contains" />
@@ -26,63 +41,24 @@
           <InputText type="text" v-model="filters['shortTitle']" class="p-column-filter" placeholder="Contains" />
         </template>
       </Column>
-      <Column field="year" header="Year" filterMatchMode="contains" :sortable="true">
+      <Column field="premiereDate" header="Premiere Date" filterMatchMode="contains" :sortable="true">
         <template #filter>
-          <InputText type="text" v-model="filters['year']" class="p-column-filter" placeholder="Contains" />
+          <InputText type="text" v-model="filters['premiereDate']" class="p-column-filter" placeholder="Contains" />
         </template>
       </Column>
-      <Column field="month" header="Month" filterMatchMode="contains" :sortable="true">
-        <template #filter>
-          <InputText type="text" v-model="filters['month']" class="p-column-filter" placeholder="Contains" />
-        </template>
-      </Column>
-      <Column field="day" header="Day" filterMatchMode="contains" :sortable="true">
-        <template #filter>
-          <InputText type="text" v-model="filters['day']" class="p-column-filter" placeholder="Contains" />
-        </template>
-      </Column>
-      <Column field="nkc" header="NKC" filterMatchMode="contains" :sortable="true">
+      <!-- <Column field="nkc" header="NKC" filterMatchMode="contains" :sortable="true">
         <template #body="slotProps">
-          <span>{{ new Date(slotProps.data.nkc).toLocaleDateString('vi') }}</span>
+          <span>{{ new Date(slotProps.data.nkc).toLocaleDateString('vi', { day: 'numeric', month: 'numeric', year: '2-digit' }) }}</span>
         </template>
-      </Column>
+      </Column>-->
 
       <template #expansion="slotProps">
-        <DataTable :value="products.filter(_prod => _prod.orderId === slotProps.data._id)" editMode="cell">
-          <Column field="product" header="Product"></Column>
-          <!-- <Column field="job" header="Job"></Column> -->
-          <Column field="createdAt" header="Created At" filterMatchMode="contains" :sortable="true">
-            <template #body="slotProps">
-              <span>{{ slotProps.data.createdAt ? new Date(slotProps.data.createdAt).toLocaleDateString('vi') : '---' }}</span>
-            </template>
-          </Column>
-          <Column field="startAt" header="Start At" filterMatchMode="contains" :sortable="true">
-            <template #body="slotProps">
-              <span v-if="slotProps.data[slotProps.column.field] > 0">{{ new Date(slotProps.data.startAt).toLocaleDateString('vi') }}</span>
-            </template>
-            <template #editor="slotProps">
-              <!-- <InputText v-if="slotProps.data[slotProps.column.field] < 1" v-model="slotProps.data[slotProps.column.field]" /> -->
-              <Calendar v-model="slotProps.data[slotProps.column.field]" :showTime="true" :showButtonBar="true" dateFormat="dd.mm.yy" />
-            </template>
-          </Column>
-          <Column field="doneAt" header="Done At" filterMatchMode="contains" :sortable="true">
-            <template #body="slotProps">
-              <span>{{ slotProps.data.doneAt ? new Date(slotProps.data.doneAt).toLocaleDateString('vi') : '---' }}</span>
-            </template>
-          </Column>
-          <Column field="endAt" header="End At" filterMatchMode="contains" :sortable="true">
-            <template #body="slotProps">
-              <span>{{ slotProps.data.endAt ? new Date(slotProps.data.endAt).toLocaleDateString('vi') : '---' }}</span>
-            </template>
-          </Column>
-          <!-- <Column field="mainStaff" header="Main Staff" :sortable="true"></Column>
-          <Column field="backupStaff" header="Backup Staff" :sortable="true"></Column> -->
-          <template #footer>
-            <div style="text-align:left">
-              <Button abel="Add" icon="pi pi-plus" @click="addNewProd(slotProps.data)" />
-            </div>
-          </template>
-        </DataTable>
+        <ProductTable :_id="slotProps.data._id" />
+      </template>
+      <template #footer>
+        <div style="text-align:left">
+          <Button abel="Add" icon="pi pi-plus" @click="addNewProd(slotProps.data)" />
+        </div>
       </template>
       <template #empty>No records found.</template>
     </DataTable>
@@ -108,9 +84,14 @@
 </template>
 
 <script>
+import ProductTable from '@/components/ProductTable.vue'
+
 import { mapState } from 'vuex'
 export default {
   name: 'Orders',
+  components: {
+    ProductTable,
+  },
   props: {},
   data: () => ({
     expandedRows: [],
@@ -122,60 +103,24 @@ export default {
   }),
   methods: {
     onRowExpand(event) {
-      this.$toast.add({ severity: 'info', summary: 'Row Expanded', detail: 'Title: ' + event.data.shortTitle, life: 3000 })
+      this.$store.dispatch('FETCH_GET_DOC', { route: 'orders/detail/' + event.data._id, loading: 'ordersDetailsLoading' })
     },
     onRowCollapse(event) {
-      this.$toast.add({ severity: 'success', summary: 'Row Collapsed', detail: 'Title: ' + event.data.shortTitle, life: 3000 })
+      console.log('id', event.data._id)
+      // this.$store.commit('SPLICE', { state: 'orderDetails', _id: event.data._id })
     },
-    expandAll() {
-      this.expandedRows = this.orders.filter(order => order.shortTitle)
-      this.$toast.add({ severity: 'success', summary: 'All Rows Expanded', life: 3000 })
-    },
-    collapseAll() {
-      this.expandedRows = []
-      this.$toast.add({ severity: 'success', summary: 'All Rows Collapsed', life: 3000 })
-    },
+    expandAll() {},
+    collapseAll() {},
     addNewProd(data) {
-      // console.log(data)
-      this.newProd = {
-        _id: '',
-        orderId: data._id,
-        foreignTitle: data.foreignTitle,
-        vietnameseTitle: data.vietnameseTitle,
-        shortTitle: data.shortTitle,
-        nkc: data.nkc,
-        day: data.day,
-        month: data.month,
-        year: data.year,
-        client: data.client,
-        product: '',
-        jobs: [],
-        createdAt: null,
-        startAt: null,
-        doneAt: null,
-        endAt: null,
-        logs: [],
-      }
-      this.dialogVisible = true
+      console.log(data)
     },
-    deleteNewProd() {
-      this.newProd = null
-      this.dialogVisible = false
-    },
-    saveNewProd() {
-      this.newProd.createdAt = Date.now()
-      this.newProd._id = this.newProd.orderId + '.' + this.newProd.product
-      this.$store.commit('ADD_PROD', this.newProd)
-      this.deleteNewProd()
-    },
+    deleteNewProd() {},
+    saveNewProd() {},
   },
-  computed: mapState(['orders', 'products', 'jobs']),
+  computed: mapState(['orderList', 'ordersListLoading']),
   mounted: function() {
-    this.$socket.client.emit('all', 'orders')
-    this.$socket.client.emit('all', 'products')
-    // if (this.jobs.length == 0) {
-    //   this.$socket.client.emit('all', 'jobs')
-    // }
+    const _updateSeq = this.orderListUpdateSeq || '1'
+    this.$store.dispatch('FETCH_GET_ALL', { route: 'orders/all/list/' + _updateSeq, loading: 'ordersListLoading' })
   },
 }
 </script>

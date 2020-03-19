@@ -1,0 +1,38 @@
+{
+  "_id": "blackwidow.payoff",
+  "name": "Payoff",
+  "sourceAt": "12:00:00, 9/3/2020",
+  "createdAt": "13:00:00, 9/3/2020",
+  "endAt": "13:00:00, 19/3/2020",
+  "finishAt": "",
+  "client": "Film",
+  "team": "Disney",
+  "foreignTitle": "Black Widow",
+  "vietnameseTitle": "Goá Phụ Đen",
+  "shortTitle": "Black Widow",
+  "premiereDate": "30/4/2020",
+  "jobs": [
+    {
+      "name": "Down File",
+      "dept": "Design",
+      "order": 0,
+      "createdAt": "13:00:00, 9/3/2020",
+      "endAt": "13:00:00, 10/3/2020",
+      "finishAt": "11:00:00, 10/3/2020",
+      "main": "Nam",
+      "assist": "Khang",
+      "tasks": ["Download", "Create Folder", "Unzip", "Check Quality", "Export Jpeg", "Check File Jpeg", "Feedback Mail"]
+    },
+    {
+      "name": "Localize",
+      "dept": "Design",
+      "order": 1,
+      "createdAt": "13:00:00, 12/3/2020",
+      "endAt": "13:00:00, 13/3/2020",
+      "finishAt": "",
+      "main": "Diễn",
+      "assist": "Hiền",
+      "tasks": ["Find Font", "Localize", "Export Jpeg", "Check File Jpeg", "Feedback Mail"]
+    }
+  ]
+}

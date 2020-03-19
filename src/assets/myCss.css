@@ -1,0 +1,25 @@
+body .p-dropdown .p-dropdown-trigger,
+body .p-multiselect .p-multiselect-trigger {
+  background-color: transparent;
+}
+body .p-datatable .p-datatable-tbody > tr.p-highlight,
+body .p-datatable .p-datatable-tbody > tr:nth-child(even).p-highlight {
+  background-color: transparent;
+  color: #333333;
+}
+body .p-inputtext,
+body .p-component {
+  font-size: 12px;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+}
+body .p-checkbox .p-checkbox-box {
+  width: 15px;
+  height: 15px;
+}
+body .p-checkbox {
+  width: 15px;
+  height: 15px;
+}
+body .p-checkbox .p-checkbox-box .p-checkbox-icon {
+  font-size: 13px;
+}
